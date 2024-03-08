@@ -107,7 +107,7 @@ const locations = [
     {
       name: "kill monster",
       "button text": ["Go to town square", "Go to town square", "Go to town square"],
-      "button functions": [goTown, goTown, goTown],
+      "button functions": [goTown, goTown, easterEgg],
       text: 'The monster screams "Arg!" as it dies. You gain experience points and find gold.'
     },
     {
@@ -121,6 +121,12 @@ const locations = [
       "button text": ["REPLAY?", "REPLAY?", "REPLAY?"],
       "button functions": [restart, restart, restart],
       text: "You defeat the dragon! YOU WIN THE GAME! &#x1F389;"
+    },
+    {
+      name: "easter egg",
+      "button text": ["2", "8", "Go to town square?"],
+      "button functions": [pickTwo, pickEight, goTown],
+      text: "You find a secret game. Pick a number above. Ten numbers will be randomly chosen between 0 and 10. If the number you choose matches one of the random numbers, you win!"
     }
 ];
 
@@ -331,8 +337,9 @@ function attack() {
   inventory.pop(), which will remove the last item in the array 
   AND return it so it appears in your string.
   */
-  }if (Math.random() <= .1) {
+  }if (Math.random() <= .1 && inventory.length !== 1) {
     text.innerText += " Your " + inventory.pop() + " breaks.";
+    currentWeapon--;
   }
 }
 
@@ -380,6 +387,11 @@ function lose() {
   update(locations[5]);
 }
 
+function winGame() {
+  winGame();
+  update(locations[6]);
+}
+
 function restart() {
   xp = 0;
   health = 100;
@@ -392,7 +404,59 @@ function restart() {
   goTown();
 } 
 
-function winGame() {
-  winGame();
-  update(locations[6]);
+function easterEgg() {
+  update(locations[7]);
+}
+
+function pickTwo() {
+  pick(2);
+}
+
+function pickEight() {
+  pick(8);
+}
+
+/*
+A while loop accepts a condition, and will run the code in the block 
+until the condition is no longer true:
+while (i < 5) {
+
+}
+for loops are declared with three expressions separated by semicolons. 
+for (a; b; c), where a is the initialization expression, 
+b is the condition, and c is the final expression.
+The initialization expression is executed only once, 
+before the loop starts, and is often used to define 
+and set up the loop variable.
+Many for loops use i as the counter and start from 0
+The second statement in a for loop, the condition statement, 
+is evaluated at the beginning of every loop iteration.
+The loop will continue as long as the condition evaluates to be true.
+The last statement in a for loop, the final expression, 
+is executed at the end of each loop iteration.
+The .includes() method determines if an array contains an element and 
+will return either true or false.
+*/
+
+function pick(guess) {
+  const numbers = [];
+  while (numbers.length < 10) {
+    numbers.push(Math.floor(Math.random() * 11));
+  }
+  text.innerText = "You picked " + guess + ". Here are the random numbers:\n";
+  for (let i = 0; i < 10; i++) {
+    text.innerText += numbers[i] + "\n";
+  }
+  if (numbers.includes(guess)) {
+    text.innerText += "Right! You win 20 gold!";
+    gold += 20;
+    goldText.innerText = gold;
+  } else {
+    text.innerText += "Wrong! You lose 10 health!";
+    health -= 10;
+    healthText.innerText = health;
+    if (health <= 0) {
+      lose();
+    }
+  }
 }
